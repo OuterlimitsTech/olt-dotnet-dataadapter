@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net9.0;net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>Latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<Description>DataAdapters Library</Description>
+	</PropertyGroup>	
+	
+	<ItemGroup>
+		<PackageReference Include="OLT.Utility.AssemblyScanner" Version="1.0.0" />
+		<PackageReference Include="Scrutor" Version="[5.0.2,)" />
+	</ItemGroup>	
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\OLT.DataAdapters.Abstractions\OLT.DataAdapters.Abstractions.csproj" />
+	</ItemGroup>	
+	
+</Project>
