@@ -4,7 +4,7 @@ using OLT.Utility.AssemblyScanner;
 namespace OLT.Core;
 
 /// <summary>
-/// Automapper Scan Utility
+/// <see cref="IOltAdapter"/> Scan Utility using Scutor <seealso cref="ServiceCollectionExtensions.Scan(IServiceCollection, Action{Scrutor.ITypeSourceSelector})"/>
 /// </summary>
 public class OltDataAdapterBuilder
 {

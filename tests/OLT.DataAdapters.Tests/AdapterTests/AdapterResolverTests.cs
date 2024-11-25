@@ -101,6 +101,7 @@ namespace OLT.DataAdapters.Tests.AdapterTests
                 var obj1 = BasicAdapterObject1.FakerData();
                 
                 var obj2Result = adapterResolver.Map<BasicAdapterObject1, BasicAdapterObject2>(obj1, new BasicAdapterObject2());
+                Assert.NotNull(obj2Result);
                 Assert.Equal(obj1.FirstName, obj2Result.Name?.First);
                 Assert.Equal(obj1.LastName, obj2Result.Name?.Last);
                 adapterResolver.Map<BasicAdapterObject2, BasicAdapterObject1>(obj2Result, new BasicAdapterObject1()).Should().BeEquivalentTo(obj1);
