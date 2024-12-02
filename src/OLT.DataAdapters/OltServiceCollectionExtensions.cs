@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using OLT.Utility.AssemblyScanner;
-using System.Reflection;
 
 namespace OLT.Core;
 

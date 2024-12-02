@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using OLT.Utility.AssemblyScanner;
+using System.Reflection;
+
 
 namespace OLT.Core;
 
@@ -8,14 +9,13 @@ namespace OLT.Core;
 /// </summary>
 public class OltDataAdapterBuilder
 {
+    private List<Assembly> _scanAssemblies = new List<Assembly>();
+
     /// <summary>
     /// The service collection for dependency injection.
     /// </summary>
     protected readonly IServiceCollection _services;
-    /// <summary>
-    /// The assembly scanner for Automapper.
-    /// </summary>
-    protected readonly OltAssemblyScanBuilder _assemblyScanner;
+
     /// <summary>
     /// The service lifetime for Automapper.
     /// </summary>
@@ -28,28 +28,29 @@ public class OltDataAdapterBuilder
     public OltDataAdapterBuilder(IServiceCollection services)
     {
         _services = services;
-        _assemblyScanner = new OltAssemblyScanBuilder().ExcludeMicrosoft().ExcludeAutomapper();
     }
 
     /// <summary>
-    /// Requires <see cref="IServiceCollection"/> a
+    /// Add mapping definitions contained in assemblies.
+    /// Looks for <see cref="IOltAdapter" /> 
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="assemblyScanner"></param>
-    public OltDataAdapterBuilder(IServiceCollection services, OltAssemblyScanBuilder assemblyScanner)
+    /// <param name="assembliesToScan">Assemblies containing mapping definitions</param>
+    public virtual OltDataAdapterBuilder AddAdapters(IEnumerable<Assembly> assembliesToScan)
     {
-        _services = services;
-        _assemblyScanner = assemblyScanner;
+        _scanAssemblies.AddRange(assembliesToScan);
+        return this;
     }
 
-    public OltAssemblyScanBuilder AssemblyScanner
+    /// <summary>
+    /// Add mapping definitions contained in assemblies.
+    /// Looks for <see cref="IOltAdapter" /> 
+    /// </summary>
+    /// <param name="assembliesToScan">Assemblies containing mapping definitions</param>
+    public virtual OltDataAdapterBuilder AddAdapters(params Assembly[] assembliesToScan)
     {
-        get
-        {
-            return _assemblyScanner;
-        }
+        _scanAssemblies.AddRange(assembliesToScan);
+        return this;
     }
-
 
     /// <summary>
     /// Set the <see cref="ServiceLifetime"/> for Automapper
@@ -70,11 +71,8 @@ public class OltDataAdapterBuilder
     {
         _services.AddSingleton<IOltAdapterResolver, OltAdapterResolver>();
 
-        _assemblyScanner.ExcludeAutomapper();
-        var assemblies = _assemblyScanner.Build();
-
         _services.Scan(sc =>
-             sc.FromAssemblies(assemblies)
+             sc.FromAssemblies(_scanAssemblies)
                  .AddClasses(classes => classes.AssignableTo<IOltAdapter>())
                  .AsImplementedInterfaces()
                  .WithLifetime(_serviceLifetime));
