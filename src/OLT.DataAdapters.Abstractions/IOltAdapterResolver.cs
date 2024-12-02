@@ -67,6 +67,6 @@ public interface IOltAdapterResolver
     /// <param name="source">The source object.</param>
     /// <param name="destination">The destination object.</param>
     /// <returns>The mapped destination object.</returns>
-    TDestination Map<TSource, TDestination>(TSource source, TDestination destination);
+    TDestination? Map<TSource, TDestination>(TSource source, TDestination destination);
 }
 

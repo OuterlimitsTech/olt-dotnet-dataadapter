@@ -106,7 +106,7 @@ public class OltAdapterResolver : IOltAdapterResolver
         return flipped.Map(source.AsEnumerable()).ToList();
     }
 
-    public virtual TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+    public virtual TDestination? Map<TSource, TDestination>(TSource source, TDestination destination)
     {
         var adapter = GetAdapter<TSource, TDestination>(false);
         if (adapter == null)

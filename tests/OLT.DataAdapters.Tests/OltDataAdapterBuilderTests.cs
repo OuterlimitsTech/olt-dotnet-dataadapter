@@ -1,13 +1,8 @@
-using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using OLT.Core;
-using OLT.Utility.AssemblyScanner;
-using Xunit;
 
 namespace OLT.DataAdapters.Tests
-{ 
+{
 
     public class OltDataAdapterBuilderTests
     {
@@ -21,24 +16,10 @@ namespace OLT.DataAdapters.Tests
             var builder = new OltDataAdapterBuilder_Test(services);
 
             // Assert
-            Assert.NotNull(builder.AssemblyScanner);
             builder.WithServiceLifetime(ServiceLifetime.Singleton);
             Assert.Equal(ServiceLifetime.Singleton, builder.ServiceLifetime);
         }
-
-        [Fact]
-        public void Constructor_WithAssemblyScanner_ShouldInitializeProperties()
-        {
-            // Arrange
-            var services = new ServiceCollection();
-            var assemblyScanner = new OltAssemblyScanBuilder();
-
-            // Act
-            var builder = new OltDataAdapterBuilder(services, assemblyScanner);
-
-            // Assert
-            Assert.Same(assemblyScanner, builder.AssemblyScanner);
-        }
+      
 
         [Fact]
         public void WithServiceLifetime_ShouldSetServiceLifetime()
