@@ -12,7 +12,7 @@ public class OltServiceCollectionExtensionsTests
         IServiceCollection services = null;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => services.AddDataAdapters(builder => { }));
+        Assert.Throws<ArgumentNullException>(() => services.AddOltAdapters(builder => { }));
     }
 
     [Fact]
@@ -23,7 +23,7 @@ public class OltServiceCollectionExtensionsTests
         var actionInvoked = false;
 
         // Act
-        services.AddDataAdapters(builder => { actionInvoked = true; });
+        services.AddOltAdapters(builder => { actionInvoked = true; });
 
         // Assert
         Assert.True(actionInvoked);
@@ -36,7 +36,7 @@ public class OltServiceCollectionExtensionsTests
         var services = new ServiceCollection();
 
         // Act
-        var result = services.AddDataAdapters(builder => { });
+        var result = services.AddOltAdapters(builder => { });
 
         // Assert
         Assert.Same(services, result);

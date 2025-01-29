@@ -82,6 +82,7 @@ public class OltAdapterResolver : IOltAdapterResolver
 
     #region [ Paged ]
 
+    [Obsolete("Removing in v10.x - Move to OltBeforeMapOrderBy")]
     protected virtual IOltAdapterPaged<TSource, TDestination>? GetPagedAdapter<TSource, TDestination>()
     {
         var adapterName = GetAdapterName<TSource, TDestination>();
@@ -106,7 +107,7 @@ public class OltAdapterResolver : IOltAdapterResolver
         return flipped.Map(source.AsEnumerable()).ToList();
     }
 
-    public virtual TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+    public virtual TDestination? Map<TSource, TDestination>(TSource source, TDestination destination)
     {
         var adapter = GetAdapter<TSource, TDestination>(false);
         if (adapter == null)

@@ -1,10 +1,7 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using OLT.Core;
 using OLT.DataAdapters.Tests.Assets.Models;
 using OLT.DataAdapters.Tests.PagedAdapterTests.Models;
-using System.Linq;
-using Xunit;
 
 namespace OLT.DataAdapters.Tests.PagedAdapterTests
 {
@@ -93,18 +90,18 @@ namespace OLT.DataAdapters.Tests.PagedAdapterTests
                     }
                 }).ToList();
 
-
                 var results = obj2ResultQueryable.ToList();
                 var expected2 = expected.OrderBy(p => p.Name!.Last).ThenBy(p => p.Name!.First).ToList();
 
-                results.Should().BeEquivalentTo(expected2, opt => opt.WithStrictOrdering());
+                Assert.Equal(expected2.Select(s => s.Name.First), results.Select(s => s.Name.First));
+                Assert.Equal(expected2.Select(s => s.Name.Last), results.Select(s => s.Name.Last));
 
-
-                adapterResolver
+                var projectedResult = adapterResolver
                     .ProjectTo<PagedAdapterObject1, PagedAdapterObject2>(obj1Values.AsQueryable(), configAction => { configAction.DisableBeforeMap = true; configAction.DisableAfterMap = true; })
-                    .Should()
-                    .BeEquivalentTo(expected, opt => opt.WithStrictOrdering());
+                    .ToList();
 
+                Assert.Equal(expected.Select(s => s.Name.First), projectedResult.Select(s => s.Name.First));
+                Assert.Equal(expected.Select(s => s.Name.Last), projectedResult.Select(s => s.Name.Last));
 
                 try
                 {
@@ -126,7 +123,9 @@ namespace OLT.DataAdapters.Tests.PagedAdapterTests
                 var adapterResolver = provider.GetRequiredService<IOltAdapterResolver>();
                 var obj1Values = PagedAdapterObject1.FakerList(56);
                 var obj2Result = adapterResolver.ApplyDefaultOrderBy<PagedAdapterObject1, PagedAdapterObject2>(obj1Values.AsQueryable()).ToList();
-                obj2Result.Should().BeEquivalentTo(obj1Values.OrderBy(p => p.LastName).ThenBy(p => p.FirstName), opt => opt.WithStrictOrdering());
+                var expected = obj1Values.OrderBy(p => p.LastName).ThenBy(p => p.FirstName).ToList();
+                Assert.Equal(expected.Select(s => s.FirstName), obj2Result.Select(s => s.FirstName));
+                Assert.Equal(expected.Select(s => s.LastName), obj2Result.Select(s => s.LastName));
             }
         }
 
@@ -139,9 +138,12 @@ namespace OLT.DataAdapters.Tests.PagedAdapterTests
                 var obj1 = PagedAdapterObject1.FakerData();
 
                 var obj2Result = adapterResolver.Map<PagedAdapterObject1, PagedAdapterObject2>(obj1, new PagedAdapterObject2());
-                Assert.Equal(obj1.FirstName, obj2Result.Name!.First);
+                Assert.Equal(obj1.FirstName, obj2Result!.Name!.First);
                 Assert.Equal(obj1.LastName, obj2Result.Name!.Last);
-                adapterResolver.Map<PagedAdapterObject2, PagedAdapterObject1>(obj2Result, new PagedAdapterObject1()).Should().BeEquivalentTo(obj1);
+                var mappedResult = adapterResolver.Map<PagedAdapterObject2, PagedAdapterObject1>(obj2Result, new PagedAdapterObject1());
+                Assert.Equal(obj1.FirstName, mappedResult.FirstName);
+                Assert.Equal(obj1.LastName, mappedResult.LastName);
+
             }
         }
 
@@ -151,15 +153,17 @@ namespace OLT.DataAdapters.Tests.PagedAdapterTests
             using (var provider = BuildProvider())
             {
                 var adapterResolver = provider.GetRequiredService<IOltAdapterResolver>();
-                var obj1Values = PagedAdapterObject1.FakerList(3);
-                var obj2Result = adapterResolver.Map<PagedAdapterObject1, PagedAdapterObject2>(obj1Values);
-                obj2Result.Should().HaveCount(obj1Values.Count);
-                obj2Result.Select(s => s.Name!.First).Should().BeEquivalentTo(obj1Values[0].FirstName, obj1Values[1].FirstName, obj1Values[2].FirstName);
-                obj2Result.Select(s => s.Name!.Last).Should().BeEquivalentTo(obj1Values[0].LastName, obj1Values[1].LastName, obj1Values[2].LastName);
-                adapterResolver.Map<PagedAdapterObject2, PagedAdapterObject1>(obj2Result).Should().BeEquivalentTo(obj1Values);
+                var obj1Values = PagedAdapterObject1.FakerList(3).OrderBy(p => p.FirstName).ThenBy(p => p.LastName).ToList();
+                var obj2Result = adapterResolver.Map<PagedAdapterObject1, PagedAdapterObject2>(obj1Values).OrderBy(p => p.Name.First).ThenBy(p => p.Name.Last).ToList();
+                Assert.Equal(obj1Values.Count, obj2Result.Count);
+                Assert.Equal(obj1Values.Select(s => s.FirstName), obj2Result.Select(s => s.Name!.First));
+                Assert.Equal(obj1Values.Select(s => s.LastName), obj2Result.Select(s => s.Name!.Last));
+                var mappedResult = adapterResolver.Map<PagedAdapterObject2, PagedAdapterObject1>(obj2Result).OrderBy(p => p.FirstName).ThenBy(p => p.LastName).ToList();
+                Assert.Equal(obj1Values.Select(s => s.FirstName), mappedResult.Select(s => s.FirstName));
+                Assert.Equal(obj1Values.Select(s => s.LastName), mappedResult.Select(s => s.LastName));
             }
         }
-                
+
 
         //[Fact]
         //public void PagedTests()

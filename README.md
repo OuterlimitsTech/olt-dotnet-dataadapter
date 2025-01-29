@@ -19,6 +19,28 @@ var records = adapterResolver.ProjectTo<PersonEntity, PersonModel>(queryable);
 
 ```
 
+#### DI Configuration
+
+Using https://www.nuget.org/packages/OLT.Utility.AssemblyScanner
+
+```csharp
+var assemblies = new OltAssemblyScanBuilder()
+    .IncludeFilter("OLT.", "MyApp.")
+    .DeepScan()
+    .ExcludeMicrosoft()
+    .ExcludeNewtonsoft()
+    .ExcludeAutomapper()
+    .Build();
+
+services.AddOltAdapters(opt => opt.AddAdapters(assemblies));
+
+services.AddOltAutoMapper(opt =>
+{
+    opt.AddMaps(assemblies);
+});
+
+```
+
 #### Simple Adapater
 
 ```csharp

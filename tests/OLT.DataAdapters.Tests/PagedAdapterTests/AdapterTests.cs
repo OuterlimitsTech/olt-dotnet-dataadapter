@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using OLT.Core;
 using OLT.DataAdapters.Tests.PagedAdapterTests.Adapters;
 using OLT.DataAdapters.Tests.PagedAdapterTests.Models;
@@ -21,12 +20,20 @@ public class AdapterTests : BaseAdpaterTests
 
             var resultObj2 = new PagedAdapterObject2();
             adapter.Map(obj1, resultObj2);
-            adapterResolver.Map(obj1, new PagedAdapterObject2()).Should().BeEquivalentTo(resultObj2);
+            var result1 = adapterResolver.Map(obj1, new PagedAdapterObject2());
+            Assert.Equal(resultObj2.Name.First, result1.Name.First);
+            Assert.Equal(resultObj2.Name.Last, result1.Name.Last);
+            //adapterResolver.Map(obj1, new PagedAdapterObject2()).Should().BeEquivalentTo(resultObj2);
 
             var resultObj1 = new PagedAdapterObject1();
             adapter.Map(resultObj2, resultObj1);
-            resultObj1.Should().BeEquivalentTo(obj1);
-            adapterResolver.Map(resultObj2, new PagedAdapterObject1()).Should().BeEquivalentTo(resultObj1);               
+            Assert.Equal(resultObj2.Name.First, resultObj1.FirstName);
+            Assert.Equal(resultObj2.Name.Last, resultObj1.LastName);
+
+
+            var result2 = adapterResolver.Map(resultObj2, new PagedAdapterObject1());
+            Assert.Equal(resultObj2.Name.First, result2.FirstName);
+            Assert.Equal(resultObj2.Name.Last, result2.LastName);
 
         }
     }
@@ -46,7 +53,8 @@ public class AdapterTests : BaseAdpaterTests
 
             var orderedExpected = _defaultOrder(queryable).ToList();
             var orderedResult = adapter.DefaultOrderBy(queryable).ToList();
-            orderedResult.Should().BeEquivalentTo(orderedExpected);
+            Assert.Equal(orderedExpected.Select(s => s.FirstName), orderedResult.Select(s => s.FirstName));
+            Assert.Equal(orderedExpected.Select(s => s.LastName), orderedResult.Select(s => s.LastName));
 
         }
     }
