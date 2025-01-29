@@ -1,15 +1,6 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using OLT.Core;
-using OLT.DataAdapters.Tests.Assets.Models;
+﻿using OLT.Core;
 using OLT.DataAdapters.Tests.ProjectToTests.Adapters;
 using OLT.DataAdapters.Tests.ProjectToTests.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace OLT.DataAdapters.Tests.ProjectToTests
 {
@@ -28,13 +19,18 @@ namespace OLT.DataAdapters.Tests.ProjectToTests
 
             var query = OltAdapterMapConfigs.BeforeMap.Apply<QueryableAdapterObject3, QueryableAdapterObject4>(list.AsQueryable());
 
-            query.Should().BeEquivalentTo(list.OrderBy(p => p.First).ThenByDescending(p => p.Last), opt => opt.WithStrictOrdering());
+            var expected1 = list.OrderBy(p => p.First).ThenByDescending(p => p.Last);
+            Assert.Equal(expected1.Select(s => s.First), query.Select(s => s.First));
+            Assert.Equal(expected1.Select(s => s.Last), query.Select(s => s.Last));
+
 
             var mapped = query.Select(s => new QueryableAdapterObject4 { First = s.First, Last = s.Last }).ToList();
             var results = OltAdapterMapConfigs.AfterMap.Apply<QueryableAdapterObject3, QueryableAdapterObject4>(mapped.AsQueryable()).ToList();
-            var expected = mapped.OrderBy(p => p.First).ThenByDescending(p => p.Last).ToList();
+            var expected2 = mapped.OrderBy(p => p.First).ThenByDescending(p => p.Last).ToList();
 
-            results.Should().BeEquivalentTo(expected, opt => opt.WithStrictOrdering());
+            Assert.Equal(expected2.Select(s => s.First), results.Select(s => s.First));
+            Assert.Equal(expected2.Select(s => s.Last), results.Select(s => s.Last));
+
         }
 
         [Fact]
@@ -47,13 +43,22 @@ namespace OLT.DataAdapters.Tests.ProjectToTests
             Assert.Throws<OltAdapterMapConfigExistsException<QueryableAdapterObject3, QueryableAdapterObject5>>(() => OltAdapterMapConfigs.AfterMap.Register<QueryableAdapterObject3, QueryableAdapterObject5>(new AdapterObject3ToAdapterObject5AfterMap(), true));
 
             var query = OltAdapterMapConfigs.BeforeMap.Apply<QueryableAdapterObject3, QueryableAdapterObject1>(list.AsQueryable());
-            query.Should().BeEquivalentTo(list);
+            //query.Should().BeEquivalentTo(list);
+
+            var expected1 = list.OrderBy(p => p.First).ThenBy(p => p.Last);
+            Assert.Equal(expected1.Select(s => s.First), query.OrderBy(p => p.First).ThenBy(p => p.Last).Select(s => s.First));
+            Assert.Equal(expected1.Select(s => s.Last), query.OrderBy(p => p.First).ThenBy(p => p.Last).Select(s => s.Last));
+
 
             var mapped = query.Select(s => new QueryableAdapterObject5 { FirstName = s.First, LastName = s.Last }).ToList();
             var results = OltAdapterMapConfigs.AfterMap.Apply<QueryableAdapterObject3, QueryableAdapterObject5>(mapped.AsQueryable()).ToList();
 
-            var expected = mapped.OrderBy(p => p.LastName).ThenByDescending(p => p.FirstName).ToList();
-            results.Should().BeEquivalentTo(expected, opt => opt.WithStrictOrdering());
+            var expected2 = mapped.OrderBy(p => p.LastName).ThenByDescending(p => p.FirstName).ToList();
+            //results.Should().BeEquivalentTo(expected, opt => opt.WithStrictOrdering());
+            
+            Assert.Equal(expected2.Select(s => s.FirstName), results.Select(s => s.FirstName));
+            Assert.Equal(expected2.Select(s => s.LastName), results.Select(s => s.LastName));
+
         }
 
         [Fact]

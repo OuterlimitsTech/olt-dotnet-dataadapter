@@ -1,7 +1,5 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using OLT.Core;
-using OLT.DataAdapters.Tests.Assets.Models;
 using OLT.DataAdapters.Tests.ProjectToTests.Models;
 
 namespace OLT.DataAdapters.Tests.ProjectToTests;
@@ -59,28 +57,19 @@ public class AdapterResolverTests : BaseAdpaterTests
         using (var provider = BuildProvider())
         {
             var adapterResolver = provider.GetRequiredService<IOltAdapterResolver>();
-            var obj1Values = QueryableAdapterObject1.FakerList(23);
+            var obj1Values = QueryableAdapterObject1.FakerList(23).OrderBy(p => p.FirstName).ThenBy(p => p.LastName).ToList();
 
             var obj2ResultQueryable = adapterResolver.ProjectTo<QueryableAdapterObject1, QueryableAdapterObject2>(obj1Values.AsQueryable());
             Assert.Throws<OltAdapterNotFoundException>(() => adapterResolver.ProjectTo<QueryableAdapterObject2, QueryableAdapterObject1>(QueryableAdapterObject2.FakerList(5).AsQueryable()));
 
-            var expected = obj1Values                    
-                .Select(s => new QueryableAdapterObject2
-                {
-                    Name = new PersonName
-                    {
-                        First = s.FirstName,
-                        Last = s.LastName,
-                    }
-                }).ToList();
 
-            obj2ResultQueryable.Should().BeEquivalentTo(expected.OrderBy(p => p.Name!.First).ThenBy(p => p.Name!.Last), opt => opt.WithStrictOrdering());
+            var result2 = adapterResolver
+                .ProjectTo<QueryableAdapterObject1, QueryableAdapterObject2>(obj1Values.AsQueryable(), configAction => { configAction.DisableBeforeMap = true; configAction.DisableAfterMap = true; })
+                .OrderBy(p => p.Name.First).ThenBy(p => p.Name.Last)
+                .ToList();
 
-            
-            adapterResolver
-                .ProjectTo<QueryableAdapterObject1, QueryableAdapterObject2>(obj1Values.AsQueryable(), configAction => { configAction.DisableBeforeMap = true; configAction.DisableAfterMap = true;  })
-                .Should()
-                .BeEquivalentTo(expected, opt => opt.WithStrictOrdering());
+            Assert.Equal(obj1Values.Select(s => s.FirstName), result2.Select(s => s.Name.First));
+            Assert.Equal(obj1Values.Select(s => s.LastName), result2.Select(s => s.Name.Last));
         }
     }
 

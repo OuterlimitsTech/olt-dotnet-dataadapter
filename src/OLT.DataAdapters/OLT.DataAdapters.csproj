@@ -12,4 +12,8 @@
 		<PackageReference Include="Scrutor" Version="[5.0.2,)" />
 	</ItemGroup>	
 	
+	<ItemGroup>
+	  <ProjectReference Include="..\OLT.DataAdapters.Abstractions\OLT.DataAdapters.Abstractions.csproj" />
+	</ItemGroup>	
+	
 </Project>

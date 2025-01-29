@@ -1,9 +1,6 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using OLT.Core;
 using OLT.DataAdapters.Tests.AdapterTests.Models;
-using System.Linq;
-using Xunit;
 
 namespace OLT.DataAdapters.Tests.AdapterTests
 {
@@ -92,6 +89,7 @@ namespace OLT.DataAdapters.Tests.AdapterTests
             }
         }
 
+
         [Fact]
         public void MapTests()
         {
@@ -99,19 +97,22 @@ namespace OLT.DataAdapters.Tests.AdapterTests
             {
                 var adapterResolver = provider.GetRequiredService<IOltAdapterResolver>();
                 var obj1 = BasicAdapterObject1.FakerData();
-                
+
                 var obj2Result = adapterResolver.Map<BasicAdapterObject1, BasicAdapterObject2>(obj1, new BasicAdapterObject2());
                 Assert.NotNull(obj2Result);
                 Assert.Equal(obj1.FirstName, obj2Result.Name?.First);
                 Assert.Equal(obj1.LastName, obj2Result.Name?.Last);
-                adapterResolver.Map<BasicAdapterObject2, BasicAdapterObject1>(obj2Result, new BasicAdapterObject1()).Should().BeEquivalentTo(obj1);
-
+                var mappedBackObj1 = adapterResolver.Map<BasicAdapterObject2, BasicAdapterObject1>(obj2Result, new BasicAdapterObject1());
+                Assert.Equal(obj1.FirstName, mappedBackObj1.FirstName);
+                Assert.Equal(obj1.LastName, mappedBackObj1.LastName);
 
                 var obj3 = BasicAdapterObject3.FakerData();
                 obj2Result = adapterResolver.Map<BasicAdapterObject3, BasicAdapterObject2>(obj3, new BasicAdapterObject2());
                 Assert.Equal(obj3.First, obj2Result.Name?.First);
                 Assert.Equal(obj3.Last, obj2Result.Name?.Last);
-                adapterResolver.Map<BasicAdapterObject2, BasicAdapterObject3>(obj2Result, new BasicAdapterObject3()).Should().BeEquivalentTo(obj3);
+                var mappedBackObj3 = adapterResolver.Map<BasicAdapterObject2, BasicAdapterObject3>(obj2Result, new BasicAdapterObject3());
+                Assert.Equal(obj3.First, mappedBackObj3.First);
+                Assert.Equal(obj3.Last, mappedBackObj3.Last);
             }
         }
 
@@ -119,24 +120,30 @@ namespace OLT.DataAdapters.Tests.AdapterTests
         public void MapListTests()
         {
             using (var provider = BuildProvider())
-            {
+            {                
                 var adapterResolver = provider.GetRequiredService<IOltAdapterResolver>();
-                var obj1Values = BasicAdapterObject1.FakerList(3);
-                var obj2Result = adapterResolver.Map<BasicAdapterObject1, BasicAdapterObject2>(obj1Values);
-                obj2Result.Should().HaveCount(obj1Values.Count);
-                obj2Result.Select(s => s.Name?.First).Should().BeEquivalentTo(obj1Values[0].FirstName, obj1Values[1].FirstName, obj1Values[2].FirstName);
-                obj2Result.Select(s => s.Name?.Last).Should().BeEquivalentTo(obj1Values[0].LastName, obj1Values[1].LastName, obj1Values[2].LastName);
-                adapterResolver.Map<BasicAdapterObject2, BasicAdapterObject1>(obj2Result).Should().BeEquivalentTo(obj1Values);
+                var obj1Values = BasicAdapterObject1.FakerList(3).OrderBy(p => p.FirstName).ThenBy(p => p.LastName).ToList();
+                var obj2Result = adapterResolver.Map<BasicAdapterObject1, BasicAdapterObject2>(obj1Values).OrderBy(p => p.Name.First).ThenBy(p => p.Name.Last).ToList();
 
+                Assert.Equal(obj1Values.Count, obj2Result.Count);                
+                Assert.Equal(obj1Values.Select(s => s.FirstName), obj2Result.Select(s => s.Name?.First));
+                Assert.Equal(obj1Values.Select(s => s.LastName), obj2Result.Select(s => s.Name?.Last));
 
-                var obj3Values = BasicAdapterObject3.FakerList(3);
-                obj2Result = adapterResolver.Map<BasicAdapterObject3, BasicAdapterObject2>(obj3Values);
-                obj2Result.Should().HaveCount(obj3Values.Count);
-                obj2Result.Select(s => s.Name?.First).Should().BeEquivalentTo(obj3Values[0].First, obj3Values[1].First, obj3Values[2].First);
-                obj2Result.Select(s => s.Name?.Last).Should().BeEquivalentTo(obj3Values[0].Last, obj3Values[1].Last, obj3Values[2].Last);
+                var mappedBackObj1Values = adapterResolver.Map<BasicAdapterObject2, BasicAdapterObject1>(obj2Result).OrderBy(p => p.FirstName).ThenBy(p => p.LastName).ToList();
+                Assert.Equal(obj1Values.Count, mappedBackObj1Values.Count);
+                Assert.Equal(obj1Values.Select(s => s.FirstName), mappedBackObj1Values.Select(s => s.FirstName));
+                Assert.Equal(obj1Values.Select(s => s.LastName), mappedBackObj1Values.Select(s => s.LastName));
+                
+                var obj3Values = BasicAdapterObject3.FakerList(3).OrderBy(p => p.First).ThenBy(p => p.Last).ToList();
+                obj2Result = adapterResolver.Map<BasicAdapterObject3, BasicAdapterObject2>(obj3Values).OrderBy(p => p.Name.First).ThenBy(p => p.Name.Last).ToList();
+                Assert.Equal(obj3Values.Count, obj2Result.Count);
+                Assert.Equal(obj3Values.Select(s => s.First), obj2Result.Select(s => s.Name?.First));
+                Assert.Equal(obj3Values.Select(s => s.Last), obj2Result.Select(s => s.Name?.Last));
 
-                adapterResolver.Map<BasicAdapterObject2, BasicAdapterObject3>(obj2Result).Should().BeEquivalentTo(obj3Values);
-
+                var mappedBackObj3Values = adapterResolver.Map<BasicAdapterObject2, BasicAdapterObject3>(obj2Result).OrderBy(p => p.First).ThenBy(p => p.Last).ToList();
+                Assert.Equal(obj3Values.Count, mappedBackObj3Values.Count);
+                Assert.Equal(obj3Values.Select(s => s.First), mappedBackObj3Values.Select(s => s.First));
+                Assert.Equal(obj3Values.Select(s => s.Last), mappedBackObj3Values.Select(s => s.Last));
             }
         }
 

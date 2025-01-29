@@ -13,6 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8AB5C15B-E09
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{007C7681-D7A4-4B70-949B-93BAE5BD6253}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Directory.Build.props = tests\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OLT.DataAdapters.Tests", "tests\OLT.DataAdapters.Tests\OLT.DataAdapters.Tests.csproj", "{910E19DD-8B2E-48C2-ABA0-3AFF1C64E310}"
 EndProject

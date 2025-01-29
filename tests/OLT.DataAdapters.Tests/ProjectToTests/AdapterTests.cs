@@ -1,24 +1,10 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
 using OLT.Core;
 using OLT.DataAdapters.Tests.ProjectToTests.Adapters;
 using OLT.DataAdapters.Tests.ProjectToTests.Models;
 
 namespace OLT.DataAdapters.Tests.ProjectToTests
 {
-    public abstract class BaseAdpaterTests 
-    {
-        protected ServiceProvider BuildProvider()
-        {
-            var services = new ServiceCollection();
-            services.AddLogging(config => config.AddConsole());
-            services.AddSingleton<IOltAdapterResolver, OltAdapterResolver>();
-            services.AddSingleton<IOltAdapter, AdapterObject1ToAdapterObject2QueryableAdapter>();
-            services.AddSingleton<IOltAdapter, AdapterObject2ToAdapterObject3QueryableAdapter>();
-            return services.BuildServiceProvider();
-        }
-    }
 
     public partial class AdapterTests : BaseAdpaterTests
     {
@@ -48,9 +34,11 @@ namespace OLT.DataAdapters.Tests.ProjectToTests
                 var adapter = new AdapterObject1ToAdapterObject2QueryableAdapter();
                 var queryableObj1 = QueryableAdapterObject1.FakerList(3).AsQueryable();
 
-                var obj2Result = adapter.Map(queryableObj1).ToList(); 
-                adapterResolver.ProjectTo<QueryableAdapterObject1, QueryableAdapterObject2>(queryableObj1).Should().BeEquivalentTo(obj2Result);
+                var obj2Result = adapter.Map(queryableObj1).ToList();
+                var result = adapterResolver.ProjectTo<QueryableAdapterObject1, QueryableAdapterObject2>(queryableObj1).OrderBy(p => p.Name.First).ThenBy(p => p.Name.Last);
 
+                Assert.Equal(queryableObj1.OrderBy(p => p.FirstName).ThenBy(p => p.LastName).Select(s => s.FirstName), result.Select(s => s.Name.First));
+                Assert.Equal(queryableObj1.OrderBy(p => p.FirstName).ThenBy(p => p.LastName).Select(s => s.LastName), result.Select(s => s.Name.Last));
             }
         }
     }
