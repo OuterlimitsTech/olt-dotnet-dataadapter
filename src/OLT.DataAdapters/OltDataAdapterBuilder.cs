@@ -9,7 +9,7 @@ namespace OLT.Core;
 /// </summary>
 public class OltDataAdapterBuilder
 {
-    private List<Assembly> _scanAssemblies = new List<Assembly>();
+    private readonly List<Assembly> _scanAssemblies = new List<Assembly>();
 
     /// <summary>
     /// The service collection for dependency injection.
