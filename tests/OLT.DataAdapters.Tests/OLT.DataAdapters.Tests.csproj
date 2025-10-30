@@ -1,23 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <!-- <IsPackable>false</IsPackable>-->
   </PropertyGroup>
 	
 	
   <ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0-rc.2.25502.107" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0-rc.2.25502.107" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-rc.2.25502.107" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
 		<PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\OLT.DataAdapters.Abstractions\OLT.DataAdapters.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\OLT.DataAdapters\OLT.DataAdapters.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="coverlet.collector" Version="6.0.4" />
+    <PackageReference Update="xunit" Version="2.9.3" />
+    <PackageReference Update="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
 
 </Project>
