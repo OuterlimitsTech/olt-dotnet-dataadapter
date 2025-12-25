@@ -3,9 +3,9 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <Company>OuterLimits Technologies, Inc</Company>
-    <Product>OLT Data Mapping/Adapteer Library</Product>
+    <Product>OLT Data Mapping/Adapter Library</Product>
     <Authors>Chris Straw</Authors>
-    <Copyright>Copyright © 2003-2025, OuterLimits Technologies, Inc Plainfield, IN</Copyright>
+    <Copyright>Copyright © 2003-2026, OuterLimits Technologies, Inc Plainfield, IN</Copyright>
     <RepositoryUrl>https://github.com/OuterlimitsTech/olt-dotnet-dataadapter</RepositoryUrl>
     <PackageIcon>icon.png</PackageIcon>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
